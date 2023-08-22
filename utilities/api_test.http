@@ -1,0 +1,6 @@
+@hostname=http://localhost:8080
+
+###
+
+GET {{hostname}}/test
+cookie: username=john
