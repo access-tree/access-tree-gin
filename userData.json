@@ -1,0 +1,12 @@
+{
+    "paths": [
+        "/john/api/home/data/chicken/legs/raw/GET/6",
+        "/john/api/home/data/chicken/legs/raw/POST/0",
+        "/john/api/home/data/chicken/legs/cooked/GET/4",
+        "/bob/api/users/dogs/names/GET/4",
+        "/alice/api/data/people/things/шеллы/POST/6",
+        "/alice/api/両/乓/乶/POST/6",
+        "/admin/api/add-endpoint/POST/6",
+        "/admin/api/remove-user/DELETE/6"
+    ]
+}
