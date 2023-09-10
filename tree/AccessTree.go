@@ -3,11 +3,12 @@ package tree
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
+	"os"
 	"strings"
 
+	"github.com/access-tree/access-tree-gin/middleware"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/exp/maps"
 )
 
 type PathArray struct {
@@ -19,18 +20,11 @@ type AccessTree struct {
 }
 
 func (tree *AccessTree) EndpointAccess(level string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		cookie, _ := c.Request.Cookie("username")
-		authorized := tree.Find(cookie.Value)
-		fmt.Println(authorized)
-		c.Set("example", "12345")
-		c.Next()
-		log.Print("auth fires")
-	}
+	return middleware.EndpointAccess(tree, level)
 }
 
 func (tree *AccessTree) ReadUserFile(fileName string) {
-	data, err := ioutil.ReadFile(fileName)
+	data, err := os.ReadFile(fileName)
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -70,16 +64,31 @@ func (tree *AccessTree) AddUri(path string) {
 	tree.add(out)
 }
 
-func (tree *AccessTree) Find(name string) string {
-	return name
+func (tree *AccessTree) Find(uriSplit []string) int {
+	runner := tree.Root
+	for len(uriSplit) > 0 {
+		segment := uriSplit[0]
+		if runner.Children[segment] == nil {
+			runner = runner.Children[uriSplit[0]]
+		} else {
+			uriSplit = uriSplit[:0]
+		}
+		uriSplit = uriSplit[1:]
+	}
+	permission := maps.Keys(runner.Children)
+	if len(permission) == 1 {
+		return permission[0]
+	} else {
+		return 0
+	}
 }
 
 func (tree *AccessTree) ListUsers() []string {
 	return []string{"ok"}
 }
 
-func (tree AccessTree) RemoveUser() {
-
+func (tree AccessTree) RemoveUser(user string) {
+	delete(tree.Root.Children, user)
 }
 
 func MakeAccessTree(root_name string) (*AccessTree, error) {
